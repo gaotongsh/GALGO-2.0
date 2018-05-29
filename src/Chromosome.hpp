@@ -85,7 +85,6 @@ Chromosome<T>::Chromosome(const GeneticAlgorithm<T>& ga)
 {
    param.resize(ga.nbparam);
    ptr = &ga;
-   chrsize = ga.nbbit;
    numgen = ga.nogen;
 }
 
@@ -112,13 +111,14 @@ Chromosome<T>::Chromosome(const Chromosome<T>& rhs)
 template <typename T>
 inline void Chromosome<T>::create()
 {
-   chr.clear();
+   // TODO Add create Chromosome function
+   //chr.clear();
 
-   for (const auto& x : ptr->param) {
-      // encoding parameter random value
-      std::string str = x->encode();
-      chr.append(str);
-   }  
+   //for (const auto& x : ptr->param) {
+   //   // encoding parameter random value
+   //   std::string str = x->encode();
+   //   chr.append(str);
+   //}  
 }
 
 /*-------------------------------------------------------------------------------------------------*/
@@ -127,14 +127,15 @@ inline void Chromosome<T>::create()
 template <typename T>
 inline void Chromosome<T>::initialize()
 {
-   chr.clear();
+   // TODO Add init Chromosome function
+   //chr.clear();
 
-   int i(0);
-   for (const auto& x : ptr->param) {
-      // encoding parameter initial value
-      std::string str = x->encode(ptr->initialSet[i++]);
-      chr.append(str);
-   }      
+   //int i(0);
+   //for (const auto& x : ptr->param) {
+   //   // encoding parameter initial value
+   //   std::string str = x->encode(ptr->initialSet[i++]);
+   //   chr.append(str);
+   //}      
 }
 
 /*-------------------------------------------------------------------------------------------------*/

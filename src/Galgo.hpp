@@ -32,13 +32,6 @@
 
 namespace galgo {
 
-// forward declarations
-template <typename T>
-class BaseParameter;
-
-template <typename T, int N = 16>
-class Parameter;
-
 template <typename T>
 class GeneticAlgorithm;
 
@@ -51,12 +44,6 @@ class Chromosome;
 // convenient typedefs
 template <typename T>
 using CHR = std::shared_ptr<Chromosome<T>>;
-
-template <typename T>
-using PAR = std::unique_ptr<BaseParameter<T>>;
-
-template <typename T, int...N>
-using TUP = std::tuple<const Parameter<T,N>&...>;
 
 }
 
@@ -72,7 +59,6 @@ using TUP = std::tuple<const Parameter<T,N>&...>;
 
 #include "Randomize.hpp"
 #include "Converter.hpp"
-#include "Parameter.hpp"
 #include "Evolution.hpp"
 #include "Chromosome.hpp"
 #include "Population.hpp"
