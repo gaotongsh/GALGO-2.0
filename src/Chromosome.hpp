@@ -21,8 +21,6 @@ public:
    Chromosome(const Chromosome<T>& rhs);
    // create new chromosome 
    void create();
-   // initialize chromosome
-   void initialize();
    // evaluate chromosome 
    void evaluate(); 
    // reset chromosome
@@ -67,7 +65,7 @@ public:
 private:
    std::vector<T> param;                     // estimated parameter(s)
    std::vector<T> result;                    // chromosome objective function(s) result
-   std::string chr;                          // string of bits representing chromosome
+   std::vector<size_t> chr;                  // vector of T representing chromosome
    const GeneticAlgorithm<T>* ptr = nullptr; // pointer to genetic algorithm
 public:
    T fitness;                                // chromosome fitness, objective function(s) result that can be modified (adapted to constraint(s), set to positive values, etc...)
@@ -75,6 +73,7 @@ private:
    T total;                                  // total sum of objective function(s) result
    int chrsize;                              // chromosome size (in number of bits)
    int numgen;                               // numero of generation
+   int numcomp;                              // number of components
 };
 
 /*-------------------------------------------------------------------------------------------------*/
@@ -111,31 +110,25 @@ Chromosome<T>::Chromosome(const Chromosome<T>& rhs)
 template <typename T>
 inline void Chromosome<T>::create()
 {
-   // TODO Add create Chromosome function
-   //chr.clear();
+   numcomp = ptr->nbparam;
 
-   //for (const auto& x : ptr->param) {
-   //   // encoding parameter random value
-   //   std::string str = x->encode();
-   //   chr.append(str);
-   //}  
-}
+   std::vector<T> seq;
 
-/*-------------------------------------------------------------------------------------------------*/
+   do {
+      chr.clear();
+      seq.clear();
+      for (size_t i = 0; i < numcomp; ++i) {
+         seq.push_back(i);
+      }
+      for (size_t i = 0; i < numcomp; ++i) {
+         size_t j = uniform<size_t>(0, seq.size());
+         auto it = seq.begin() + j;
+         chr.push_back(seq[j]);
+         chr.erase(it);
+      }
+      evaluate();
+   } while (fitness < numcomp - 1);
 
-// initialize chromosome (from known parameter values)
-template <typename T>
-inline void Chromosome<T>::initialize()
-{
-   // TODO Add init Chromosome function
-   //chr.clear();
-
-   //int i(0);
-   //for (const auto& x : ptr->param) {
-   //   // encoding parameter initial value
-   //   std::string str = x->encode(ptr->initialSet[i++]);
-   //   chr.append(str);
-   //}      
 }
 
 /*-------------------------------------------------------------------------------------------------*/
