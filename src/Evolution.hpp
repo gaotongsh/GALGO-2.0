@@ -313,6 +313,24 @@ void UXO(const galgo::Population<T>& x, galgo::CHR<T>& chr1, galgo::CHR<T>& chr2
 
 /*-------------------------------------------------------------------------------------------------*/
 
+// cross-over of 2 assembly sequence chromosomes
+template <typename T>
+void ASSEMB_CRO(const galgo::Population<T>& x, galgo::CHR<T>& chr1, galgo::CHR<T>& chr2) {
+    // choosing randomly 2 chromosomes from mating population
+    int idx1 = galgo::uniform<int>(0, x.matsize());
+    int idx2 = galgo::uniform<int>(0, x.matsize());
+    // choosing randomly a position for cross-over
+    int pos = galgo::uniform<int>(0, chr1->size());
+    // transmitting portion of bits to new chromosomes
+    chr1->setPortion(*x[idx1], 0, pos);
+    chr2->setPortion(*x[idx2], 0, pos);
+    // set the other half of the chromosomes
+    chr1->setRest(*x[idx2], pos);
+    chr2->setRest(*x[idx1], pos);
+}
+
+/*-------------------------------------------------------------------------------------------------*/
+
 // MUTATION METHODS
 
 /*-------------------------------------------------------------------------------------------------*/
@@ -385,6 +403,22 @@ void UNM(galgo::CHR<T>& chr)
       }     
    }
 }
+
+/*-------------------------------------------------------------------------------------------------*/
+
+// mutation of assembly sequence chromosomes
+template <typename T>
+void ASSEMB_MUT(galgo::CHR<T>& chr) {
+    T mutrate = chr->mutrate();
+
+    if (mutrate == 0.0) return;
+
+    int idx1 = galgo::uniform<int>(1, chr->nbgene()), idx2;
+    while ((idx2 = galgo::uniform<int>(1, chr->nbgene())) == idx1);
+    chr->swapGene(idx1, idx2);
+}
+
+// TODO cut and paste
 
 /*-------------------------------------------------------------------------------------------------*/
 

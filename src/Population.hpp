@@ -99,22 +99,12 @@ Population<T>::Population(const GeneticAlgorithm<T>& ga)
 template <typename T>
 void Population<T>::creation()
 {
-   int start = 0;
+   int start = 1;
    // initializing first chromosome
-   if (!ptr->initialSet.empty()) {
-      curpop[0] = std::make_shared<Chromosome<T>>(*ptr);
-      curpop[0]->initialize();
-      curpop[0]->evaluate();
-      start++;
-   }
-   // getting the rest
-   #ifdef _OPENMP 
-   #pragma omp parallel for num_threads(MAX_THREADS)
-   #endif
+   curpop[0] = std::make_shared<Chromosome<T>>(*ptr);
+   curpop[0]->create();
    for (int i = start; i < ptr->popsize; ++i) {
-      curpop[i] = std::make_shared<Chromosome<T>>(*ptr);
-      curpop[i]->create();
-      curpop[i]->evaluate();
+      curpop[i] = std::make_shared<Chromosome<T>>(curpop[0]);
    }
    // updating population
    this->updating();
@@ -172,10 +162,7 @@ void Population<T>::recombination()
       newpop[i] = std::make_shared<Chromosome<T>>(*ptr);
       newpop[i+1] = std::make_shared<Chromosome<T>>(*ptr);
       // crossing-over mating population to create 2 new chromosomes
-      ptr->CrossOver(*this, newpop[i], newpop[i+1]);
-      // mutating new chromosomes
-      ptr->Mutation(newpop[i]);   
-      ptr->Mutation(newpop[i+1]);   
+      ptr->CrossOver(*this, newpop[i], newpop[i+1]);  
       // evaluating new chromosomes
       newpop[i]->evaluate();
       newpop[i+1]->evaluate();
@@ -306,18 +293,22 @@ inline void Population<T>::select(int pos)
 template <typename T>
 void Population<T>::adjustFitness()
 {
-   // getting worst population fitness
-   T worstFitness = curpop.back()->fitness;
+   T best_fitness = curpop.front()->fitness;
+   T sum_fitness = getSumFitness();
+   T average_fitness = sum_fitness / popsize;
 
-   if (worstFitness < 0) {
-      // getting best fitness
-      T bestFitness = curpop.front()->fitness;
-      // case where all fitness are equal and negative
-      if (worstFitness == bestFitness) {
-         std::for_each(curpop.begin(), curpop.end(), [](CHR<T>& chr)->void{chr->fitness *= -1;});
-       } else {
-         std::for_each(curpop.begin(), curpop.end(), [worstFitness](CHR<T>& chr)->void{chr->fitness -= worstFitness;});
-      }
+   T fa = ptr->fa, fb = ptr->fb;
+
+   // case where all fitness are equal
+   if (average_fitness == best_fitness) {
+      std::for_each(curpop.begin(), curpop.end(), [fa](CHR<T>& chr)->void{chr->fitness = fa;});
+   } else {
+      std::for_each(curpop.begin(), curpop.end(), [fa, fb, average_fitness, best_fitness](CHR<T>& chr)->void{
+         if (chr->fitness > average_fitness)
+            chr->fitness = fa + (fb - fa) / (best_fitness - average_fitness) * (chr->fitness - average_fitness);
+         else
+            chr->fitness = fa / average_fitness * chr->fitness;
+      });
    }
 }
 
