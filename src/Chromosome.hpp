@@ -29,6 +29,8 @@ public:
    void setGene(int k);
    // initialize or replace kth gene by a know value
    void initGene(int k, T value);
+   // swap two genes of a chromosome
+   void swapGene(int i, int j);
    // add bit to chromosome
    void addBit(char bit);
    // initialize or replace an existing chromosome bit   
@@ -41,6 +43,8 @@ public:
    void setPortion(const Chromosome<T>& x, int start, int end);
    // initialize or replace a portion of bits with a portion of another chromosome
    void setPortion(const Chromosome<T>& x, int start);
+   // initialize or replace a rest portion of bits with another chromosome
+   void setRest(const Chromosome<T>& x, int start);
    // get parameter value(s) from chromosome
    const std::vector<T>& getParam() const;
    // get objective function result
@@ -201,6 +205,17 @@ inline void Chromosome<T>::initGene(int k, T x)
 
 /*-------------------------------------------------------------------------------------------------*/
 
+// swap two genes of a chromosome
+template <typename T>
+inline void Chromosome<T>::swapGene(int i, int j)
+{
+    size_t temp = chr[i];
+    chr[i] = chr[j];
+    chr[j] = temp;
+}
+
+/*-------------------------------------------------------------------------------------------------*/
+
 // add chromosome bit to chromosome (when constructing a new one)
 template <typename T>
 inline void Chromosome<T>::addBit(char bit)
@@ -296,6 +311,29 @@ inline void Chromosome<T>::setPortion(const Chromosome<T>& x, int start)
    #endif
 
    chr.replace(start, chrsize, x.chr, start, x.chrsize);
+}
+
+/*-------------------------------------------------------------------------------------------------*/
+
+// initialize or replace a rest portion of bits with another chromosome
+template <typename T>
+inline void setRest(const Chromosome<T>& x, int start)
+{
+    std::set<size_t> had;
+    for (size_t i = 0; i < start; ++i) {
+        had.insert(chr[i]);
+    }
+    for (auto &i : x.chr) {
+        if (had.find(i) == had.end()) {
+            chr[start++] = i;
+            had.insert(i);
+        }
+    }
+    #ifndef NDEBUG
+    if (start != chrsize) {
+        throw std::runtime_error("Error: SetRest function error!.");
+    }
+    #endif
 }
 
 /*-------------------------------------------------------------------------------------------------*/
