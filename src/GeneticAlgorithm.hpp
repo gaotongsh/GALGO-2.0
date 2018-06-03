@@ -172,7 +172,7 @@ template <typename T>
 void GeneticAlgorithm<T>::print() const
 {
    // getting best parameter(s) from best chromosome
-   std::vector<T> bestParam = pop(0)->getParam();
+   auto bestParam = pop(0)->getParam();
    std::vector<T> bestResult = pop(0)->getResult();
 
    if (nogen % genstep == 0) {

@@ -46,7 +46,7 @@ public:
    // initialize or replace a rest portion of bits with another chromosome
    void setRest(const Chromosome<T>& x, int start);
    // get parameter value(s) from chromosome
-   const std::vector<T>& getParam() const;
+   const std::vector<size_t>& getParam() const;
    // get objective function result
    const std::vector<T>& getResult() const;
    // get the total sum of all objective function(s) result
@@ -91,6 +91,8 @@ Chromosome<T>::Chromosome(const GeneticAlgorithm<T>& ga)
    ptr = &ga;
    chrsize = ga.nbparam;
    numgen = ga.nogen;
+   for (int i = 0; i < chrsize; ++i)
+       chr.push_back(i);
 }
 
 /*-------------------------------------------------------------------------------------------------*/
@@ -338,9 +340,9 @@ inline void Chromosome<T>::setRest(const Chromosome<T>& x, int start)
 
 // get parameter value(s) from chromosome
 template <typename T>
-inline const std::vector<T>& Chromosome<T>::getParam() const
+inline const std::vector<size_t>& Chromosome<T>::getParam() const
 {
-   return param;
+   return chr;
 }
 
 /*-------------------------------------------------------------------------------------------------*/
