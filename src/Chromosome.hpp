@@ -124,7 +124,7 @@ inline void Chromosome<T>::create()
    do {
       std::shuffle(chr.begin(), chr.end(), rng);
       evaluate();
-   } while (fitness < chrsize - 1);
+   } while (total < 0);
 
 }
 
@@ -137,15 +137,16 @@ inline void Chromosome<T>::evaluate()
    // computing objective result(s) 
    result.clear();
    int result0 = ptr->planner->get_reorientation_time(chr);
-   if (result0 == -1) {
-       result.push_back(static_cast<T>(ptr->nbparam) / 2);
-   } else {
-       result.push_back(2 * static_cast<T>(ptr->nbparam) - result0);
-   }
+   result.push_back(result0);
    // computing sum of all results (in case there is not only one objective functions)
    total = std::accumulate(result.begin(), result.end(), 0.0);
    // initializing fitness to this total
    fitness = total;
+   if (fitness < 0) {
+       fitness = static_cast<T>(ptr->nbparam) / 2;
+   } else {
+       fitness = 2 * static_cast<T>(ptr->nbparam) - result0;
+   }
 }
 
 /*-------------------------------------------------------------------------------------------------*/
