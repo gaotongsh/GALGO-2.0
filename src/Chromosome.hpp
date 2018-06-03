@@ -65,6 +65,8 @@ public:
    const std::vector<T>& lowerBound() const;
    // return upper bound(s)
    const std::vector<T>& upperBound() const;
+   // return chromosome itself
+   const std::vector<size_t>& getChr() const;
 
 private:
    std::vector<T> param;                     // estimated parameter(s)
@@ -419,6 +421,14 @@ template <typename T>
 inline const std::vector<T>& Chromosome<T>::upperBound() const
 {
    return ptr->upperBound;
+}
+
+/*-------------------------------------------------------------------------------------------------*/
+
+// return chromosome itself
+template <typename T>
+inline const std::vector<size_t>& Chromosome<T>::getChr() const {
+    return chr;
 }
 
 //=================================================================================================
