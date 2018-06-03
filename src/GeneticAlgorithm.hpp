@@ -32,8 +32,8 @@ private:
    std::vector<int> idx;          // indexes for chromosome breakdown
 
 public: 
-   // objective function pointer
-   Func<T> Objective; 
+   // Assembly Planner
+   AssemblyPlanner *planner;
    // selection method initialized to roulette wheel selection                                   
    void (*Selection)(Population<T>&) = RWS;  
    // cross-over method initialized to 1-point cross-over                                
@@ -60,7 +60,7 @@ public:
    int precision = 5; // precision for outputting results
 
    // constructor
-   GeneticAlgorithm(Func<T> objective, int popsize, int nbgen, bool output, int nbparam);
+   GeneticAlgorithm(AssemblyPlanner *planner, int popsize, int nbgen, bool output, int nbparam);
    // run genetic algorithm
    void run();
    // return best chromosome 
@@ -81,9 +81,9 @@ private:
    
 // constructor
 template <typename T>
-GeneticAlgorithm<T>::GeneticAlgorithm(Func<T> objective, int popsize, int nbgen, bool output, int nbparam)
+GeneticAlgorithm<T>::GeneticAlgorithm(AssemblyPlanner *planner, int popsize, int nbgen, bool output, int nbparam)
 {
-   this->Objective = objective;
+   this->planner = planner;
    // getting total number of bits per chromosome
    this->nbgen = nbgen;
    // getting number of parameters in the pack

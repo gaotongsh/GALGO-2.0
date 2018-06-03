@@ -104,7 +104,7 @@ void Population<T>::creation()
    curpop[0] = std::make_shared<Chromosome<T>>(*ptr);
    curpop[0]->create();
    for (int i = start; i < ptr->popsize; ++i) {
-      curpop[i] = std::make_shared<Chromosome<T>>(curpop[0]);
+      curpop[i] = std::make_shared<Chromosome<T>>(*curpop[0]);
    }
    // updating population
    this->updating();
@@ -295,7 +295,7 @@ void Population<T>::adjustFitness()
 {
    T best_fitness = curpop.front()->fitness;
    T sum_fitness = getSumFitness();
-   T average_fitness = sum_fitness / popsize;
+   T average_fitness = sum_fitness / popsize();
 
    T fa = ptr->fa, fb = ptr->fb;
 

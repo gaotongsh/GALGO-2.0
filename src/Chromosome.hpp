@@ -77,7 +77,6 @@ private:
    T total;                                  // total sum of objective function(s) result
    int chrsize;                              // chromosome size (in number of bits)
    int numgen;                               // numero of generation
-   int numcomp;                              // number of components
 };
 
 /*-------------------------------------------------------------------------------------------------*/
@@ -88,6 +87,7 @@ Chromosome<T>::Chromosome(const GeneticAlgorithm<T>& ga)
 {
    param.resize(ga.nbparam);
    ptr = &ga;
+   chrsize = ga.nbparam;
    numgen = ga.nogen;
 }
 
@@ -114,24 +114,15 @@ Chromosome<T>::Chromosome(const Chromosome<T>& rhs)
 template <typename T>
 inline void Chromosome<T>::create()
 {
-   numcomp = ptr->nbparam;
-
-   std::vector<T> seq;
+   chr.clear();
+   for (size_t i = 0; i < chrsize; ++i) {
+       chr.push_back(i);
+   }
 
    do {
-      chr.clear();
-      seq.clear();
-      for (size_t i = 0; i < numcomp; ++i) {
-         seq.push_back(i);
-      }
-      for (size_t i = 0; i < numcomp; ++i) {
-         size_t j = uniform<size_t>(0, seq.size());
-         auto it = seq.begin() + j;
-         chr.push_back(seq[j]);
-         chr.erase(it);
-      }
+      std::shuffle(chr.begin(), chr.end(), rng);
       evaluate();
-   } while (fitness < numcomp - 1);
+   } while (fitness < chrsize - 1);
 
 }
 
@@ -141,14 +132,14 @@ inline void Chromosome<T>::create()
 template <typename T>
 inline void Chromosome<T>::evaluate() 
 {
-   int i(0);
-   for (const auto& x : ptr->param) {
-      // decoding chromosome: converting chromosome string into a real value
-      param[i] = x->decode(chr.substr(ptr->idx[i], x->size()));
-      i++;
-   } 
    // computing objective result(s) 
-   result = ptr->Objective(param);
+   result.clear();
+   int result0 = ptr->planner->get_reorientation_time(chr);
+   if (result0 == -1) {
+       result.push_back(static_cast<T>(ptr->nbparam) / 2);
+   } else {
+       result.push_back(2 * static_cast<T>(ptr->nbparam) - result0);
+   }
    // computing sum of all results (in case there is not only one objective functions)
    total = std::accumulate(result.begin(), result.end(), 0.0);
    // initializing fitness to this total
@@ -295,7 +286,9 @@ inline void Chromosome<T>::setPortion(const Chromosome<T>& x, int start, int end
    }
    #endif
 
-   chr.replace(start, end - start + 1, x.chr, start, end - start + 1);
+   for (size_t i = start; i < end; ++i) {
+       chr[i] = x.chr[i];
+   }
 }
 
 /*-------------------------------------------------------------------------------------------------*/
@@ -310,14 +303,16 @@ inline void Chromosome<T>::setPortion(const Chromosome<T>& x, int start)
    }
    #endif
 
-   chr.replace(start, chrsize, x.chr, start, x.chrsize);
+   for (size_t i = start; i < chrsize; ++i) {
+       chr[i] = x.chr[i];
+   }
 }
 
 /*-------------------------------------------------------------------------------------------------*/
 
 // initialize or replace a rest portion of bits with another chromosome
 template <typename T>
-inline void setRest(const Chromosome<T>& x, int start)
+inline void Chromosome<T>::setRest(const Chromosome<T>& x, int start)
 {
     std::set<size_t> had;
     for (size_t i = 0; i < start; ++i) {
