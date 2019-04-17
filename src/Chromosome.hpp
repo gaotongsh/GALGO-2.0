@@ -25,18 +25,10 @@ public:
    void evaluate(); 
    // reset chromosome
    void reset();
-   // set or replace kth gene by a new one
-   void setGene(int k);
-   // initialize or replace kth gene by a know value
-   void initGene(int k, T value);
    // swap two genes of a chromosome
    void swapGene(int i, int j);
    // add bit to chromosome
    void addBit(char bit);
-   // initialize or replace an existing chromosome bit   
-   void setBit(char bit, int pos);
-   // flip an existing chromosome bit
-   void flipBit(int pos);
    // get chromosome bit
    char getBit(int pos) const;
    // initialize or replace a portion of bits with a portion of another chromosome
@@ -165,42 +157,6 @@ inline void Chromosome<T>::reset()
 
 /*-------------------------------------------------------------------------------------------------*/
 
-// set or replace kth gene by a new one
-template <typename T>
-inline void Chromosome<T>::setGene(int k)
-{
-   #ifndef NDEBUG
-   if (k < 0 || k >= ptr->nbparam) {
-      throw std::invalid_argument("Error: in galgo::Chromosome<T>::setGene(int), argument cannot be outside interval [0,nbparam-1], please amend.");
-   }
-   #endif
-
-   // generating a new gene
-   std::string s = ptr->param[k]->encode();
-   // adding or replacing gene in chromosome
-   chr.replace(ptr->idx[k], s.size(), s, 0, s.size());
-}
-
-/*-------------------------------------------------------------------------------------------------*/
-
-// initialize or replace kth gene by a know value
-template <typename T>
-inline void Chromosome<T>::initGene(int k, T x)
-{
-   #ifndef NDEBUG
-   if (k < 0 || k >= ptr->nbparam) {
-      throw std::invalid_argument("Error: in galgo::Chromosome<T>::initGene(int), first argument cannot be outside interval [0,nbparam-1], please amend.");
-   }
-   #endif
-
-   // encoding gene
-   std::string s = ptr->param[k]->encode(x);
-   // adding or replacing gene in chromosome
-   chr.replace(ptr->idx[k], s.size(), s, 0, s.size());
-}
-
-/*-------------------------------------------------------------------------------------------------*/
-
 // swap two genes of a chromosome
 template <typename T>
 inline void Chromosome<T>::swapGene(int i, int j)
@@ -223,45 +179,6 @@ inline void Chromosome<T>::addBit(char bit)
       throw std::out_of_range("Error: in galgo::Chromosome<T>::setBit(char), exceeding chromosome size.");
    }
    #endif
-}
-
-/*-------------------------------------------------------------------------------------------------*/
-
-// initialize or replace an existing chromosome bit   
-template <typename T>
-inline void Chromosome<T>::setBit(char bit, int pos)
-{  
-   #ifndef NDEBUG
-   if (pos >= chrsize) {
-      throw std::out_of_range("Error: in galgo::Chromosome<T>::replaceBit(char, int), second argument cannot be equal or greater than chromosome size.");
-   }
-   #endif
-
-   std::stringstream ss;
-   std::string str;
-   ss << bit;
-   ss >> str;
-   chr.replace(pos, 1, str);
-   std::cout << chr << "\n";
-}
-
-/*-------------------------------------------------------------------------------------------------*/
-      
-// flip an existing chromosome bit
-template <typename T>
-inline void Chromosome<T>::flipBit(int pos)
-{
-   #ifndef NDEBUG
-   if (pos >= chrsize) {
-      throw std::out_of_range("Error: in galgo::Chromosome<T>::flipBit(int), argument cannot be equal or greater than chromosome size.");
-   }
-   #endif
-
-   if (chr[pos] == '0') {
-      chr.replace(pos, 1, "1");
-   } else {
-      chr.replace(pos, 1, "0");
-   }
 }
 
 /*-------------------------------------------------------------------------------------------------*/
